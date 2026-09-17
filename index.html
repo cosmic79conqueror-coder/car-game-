@@ -139,6 +139,9 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
         
+        // Road line position for scrolling effect
+        let lineY = 0;
+        
         // Player car
         const player = {
             x: canvasWidth / 2 - 40,
@@ -237,8 +240,10 @@
             
             // Road lines
             ctx.fillStyle = '#fff';
-            for (let i = 0; i < canvasHeight / 40; i++) {
-                ctx.fillRect(canvasWidth / 2 - 10, i * 40, 20, 20);
+            lineY += 5;
+            if (lineY > 40) lineY = 0;
+            for (let i = 0; i < canvasHeight / 40 + 1; i++) {
+                ctx.fillRect(canvasWidth / 2 - 10, (i * 40 - lineY) % 40, 20, 20);
             }
             
             // Spawn objects
@@ -320,9 +325,6 @@
             highScoreEl.textContent = `High Score: ${highScore}`;
             startScreen.style.display = 'flex';
         }
-        
-        // Event listeners
-        startButton.addEventListener('click', startGame);
         
         // Initialize
         scoreEl.textContent = `Score: ${score}`;
