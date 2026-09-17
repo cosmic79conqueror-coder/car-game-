@@ -19,10 +19,10 @@ A simple yet addictive HTML5 car racing game where you dodge obstacles and colle
    - The car stays within the road lanes automatically
 
 5. **Gameplay objectives**:
-   - 🚗 **Avoid red obstacles** - Collision ends the game
-   - ⭐ **Collect yellow stars** - Worth 50 points each
-   - 📈 **Score increases** as you survive longer
-   - ⚡ **Game speeds up** every 50 points
+   - **Avoid red obstacles** - Collision ends the game
+   - **Collect yellow stars** - Worth 50 points each
+   - **Score increases** as you survive longer
+   - **Game speeds up** every 50 points
 
 6. **Pause/Resume**: Press **Esc** key during gameplay to pause/resume
    - Click "Resume" to continue
