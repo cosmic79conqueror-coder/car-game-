@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Racing Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #0a0a0f;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        #gameCanvas {
+            display: block;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0d0d17 100%);
+        }
+        
+        #ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        #score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ff88;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        #highScore {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #ff6b6b;
+            font-size: 20px;
+            text-shadow: 0 0 10px #ff6b6b;
+        }
+        
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 15, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        
+        #startScreen h1 {
+            color: #00ff88;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px #00ff88;
+        }
+        
+        #startScreen p {
+            color: #ccc;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+        
+        #startButton {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: #00ff88;
+            color: #0a0a0f;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        #startButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #00ff88;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="ui">
+        <div id="score">Score: 0</div>
+        <div id="highScore">High Score: 0</div>
+        <div id="startScreen">
+            <h1>Car Racing Game</h1>
+            <p>Avoid obstacles and collect stars!</p>
+            <button id="startButton">Start Game</button>
+        </div>
+        <div id="controls">Arrow keys to move</div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const highScoreEl = document.getElementById('highScore');
+        const startScreen = document.getElementById('startScreen');
+        const startButton = document.getElementById('startButton');
+        
+        let canvasWidth, canvasHeight;
+        let gameRunning = false;
+        let score = 0;
+        let highScore = parseInt(localStorage.getItem('racingHighScore')) || 0;
+        
+        function resizeCanvas() {
+            canvasWidth = window.innerWidth;
+            canvasHeight = window.innerHeight - 50;
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Player car
+        const player = {
+            x: canvasWidth / 2 - 40,
+            y: canvasHeight - 80,
+            width: 80,
+            height: 40,
+            speed: 5,
+            dx: 0
+        };
+        
+        // Obstacles
+        let obstacles = [];
+        let stars = [];
+        
+        // Input
+        const keys = {
+            ArrowLeft: false,
+            ArrowRight: false,
+            ArrowUp: false,
+            ArrowDown: false
+        };
+        
+        window.addEventListener('keydown', (e) => {
+            if (e.key in keys) {
+                keys[e.key] = true;
+                e.preventDefault();
+            }
+            if (e.key === 'Enter' && !gameRunning) {
+                startGame();
+            }
+        });
+        
+        window.addEventListener('keyup', (e) => {
+            if (e.key in keys) {
+                keys[e.key] = false;
+            }
+        });
+        
+        // Game objects
+        function createObstacle() {
+            const width = Math.random() * 60 + 40;
+            const height = Math.random() * 40 + 40;
+            const x = Math.random() * (canvasWidth - width);
+            const y = -height;
+            return { x, y, width, height, speed: Math.random() * 3 + 2 };
+        }
+        
+        function createStar() {
+            const size = Math.random() * 15 + 5;
+            const x = Math.random() * (canvasWidth - size);
+            const y = -size;
+            return { x, y, size, speed: Math.random() * 2 + 1 };
+        }
+        
+        function startGame() {
+            gameRunning = true;
+            score = 0;
+            obstacles = [];
+            stars = [];
+            startScreen.style.display = 'none';
+            player.dx = 0;
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Spawn obstacles and stars
+        function spawnObjects() {
+            if (Math.random() < 0.02) {
+                obstacles.push(createObstacle());
+            }
+            if (Math.random() < 0.01) {
+                stars.push(createStar());
+            }
+        }
+        
+        // Collision detection
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+        
+        // Game loop
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Background
+            ctx.fillStyle = '#0d0d17';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            
+            // Road
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(canvasWidth * 0.2, 0, canvasWidth * 0.6, canvasHeight);
+            
+            // Road lines
+            ctx.fillStyle = '#fff';
+            for (let i = 0; i < canvasHeight / 40; i++) {
+                ctx.fillRect(canvasWidth / 2 - 10, i * 40, 20, 20);
+            }
+            
+            // Spawn objects
+            spawnObjects();
+            
+            // Update and draw obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obs = obstacles[i];
+                obs.y += obs.speed;
+                
+                if (obs.y > canvasHeight) {
+                    obstacles.splice(i, 1);
+                    score += 10;
+                    scoreEl.textContent = `Score: ${score}`;
+                    continue;
+                }
+                
+                // Draw obstacle
+                ctx.fillStyle = '#ff5555';
+                ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+                
+                // Collision
+                if (checkCollision(player, obs)) {
+                    gameOver();
+                }
+            }
+            
+            // Update and draw stars
+            for (let i = stars.length - 1; i >= 0; i--) {
+                const star = stars[i];
+                star.y += star.speed;
+                
+                if (star.y > canvasHeight) {
+                    stars.splice(i, 1);
+                    continue;
+                }
+                
+                // Draw star
+                ctx.fillStyle = '#ffdd00';
+                ctx.beginPath();
+                ctx.arc(star.x + star.size / 2, star.y + star.size / 2, star.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Collect star
+                const dx = player.x + player.width / 2 - (star.x + star.size / 2);
+                const dy = player.y + player.height / 2 - (star.y + star.size / 2);
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < player.width / 2 + star.size / 2) {
+                    stars.splice(i, 1);
+                    score += 50;
+                    scoreEl.textContent = `Score: ${score}`;
+                }
+            }
+            
+            // Update and draw player
+            player.dx = (keys.ArrowRight ? 1 : 0) - (keys.ArrowLeft ? 1 : 0);
+            player.x += player.dx * player.speed;
+            
+            // Keep player on road
+            if (player.x < canvasWidth * 0.2) {
+                player.x = canvasWidth * 0.2;
+            } else if (player.x + player.width > canvasWidth * 0.8) {
+                player.x = canvasWidth * 0.8 - player.width;
+            }
+            
+            ctx.fillStyle = '#00ff88';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        function gameOver() {
+            gameRunning = false;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('racingHighScore', highScore);
+            }
+            highScoreEl.textContent = `High Score: ${highScore}`;
+            startScreen.style.display = 'flex';
+        }
+        
+        // Event listeners
+        startButton.addEventListener('click', startGame);
+        
+        // Initialize
+        scoreEl.textContent = `Score: ${score}`;
+        highScoreEl.textContent = `High Score: ${highScore}`;
+    </script>
+</body>
+</html>
