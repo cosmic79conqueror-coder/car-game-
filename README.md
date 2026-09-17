@@ -32,42 +32,16 @@ A simple yet addictive HTML5 car racing game where you dodge obstacles and colle
    - Displayed on the top right of the screen
    - Persists even after you close the browser
 
-## Controls Summary
-
-| Action | Control |
-|--------|---------|
-| Move Left | ← Arrow Key |
-| Move Right | → Arrow Key |
-| Pause/Resume | Esc Key |
-| Start Game | Click "Start" button or Press Enter |
-
 ## Game Features
 
-- ✅ Three difficulty levels (Easy, Medium, Hard)
-- ✅ Automatic road lane constraints keep car in bounds
-- ✅ Progressive speed increase as score rises
-- ✅ Star collection for bonus points
-- ✅ High score persistence
-- ✅ Pause menu with Resume/Exit options
-- ✅ Responsive design works on mobile and desktop
-- ✅ Moving road lines create motion illusion
-
-## Technical Details
-
-- Built with HTML5 Canvas
-- No external dependencies required
-- Lightweight and runs in any modern browser
-- Score and high score saved to localStorage
-- Game loop runs at 60fps using requestAnimationFrame
-
-## File Structure
-
-```
-Car racing/
-│
-├── index.html    # Main game file (HTML, CSS, JavaScript)
-└── README.md     # This file - game instructions and features
-```
+- Three difficulty levels (Easy, Medium, Hard)
+- Automatic road lane constraints keep car in bounds
+- Progressive speed increase as score rises
+- Star collection for bonus points
+- High score persistence
+- Pause menu with Resume/Exit options
+- Responsive design works on mobile and desktop
+- Moving road lines create motion illusion
 
 ## Enjoy the Game!
 
