@@ -5,103 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Racing Game</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            overflow: hidden;
-            background: #0a0a0f;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        #gameCanvas {
-            display: block;
-            background: linear-gradient(180deg, #1a1a2e 0%, #0d0d17 100%);
-        }
-        
-        #ui {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 10;
-        }
-        
-        #score {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: #00ff88;
-            font-size: 24px;
-            font-weight: bold;
-            text-shadow: 0 0 10px #00ff88;
-        }
-        
-        #highScore {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: #ff6b6b;
-            font-size: 20px;
-            text-shadow: 0 0 10px #ff6b6b;
-        }
-        
-        #startScreen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 10, 15, 0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-        
-        #startScreen h1 {
-            color: #00ff88;
-            font-size: 48px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px #00ff88;
-        }
-        
-        #startScreen p {
-            color: #ccc;
-            font-size: 18px;
-            margin-bottom: 40px;
-        }
-        
-        #startButton {
-            padding: 15px 30px;
-            font-size: 20px;
-            background: #00ff88;
-            color: #0a0a0f;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        #startButton:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px #00ff88;
-        }
-        
-        #controls {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #fff;
-            font-size: 16px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #0a0a0f; font-family: sans-serif; }
+        #gameCanvas { display: block; background: #1a1a2e; }
+        #ui { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; color: #fff; }
+        #score { position: absolute; top: 20px; left: 20px; font-size: 24px; }
+        #highScore { position: absolute; top: 20px; right: 20px; font-size: 20px; }
+        #startScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,10,15,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 200; }
+        #startScreen h1 { color: #00ff88; font-size: 48px; margin-bottom: 20px; text-shadow: 0 0 20px #00ff88; }
+        #startScreen p { color: #ccc; font-size: 18px; margin-bottom: 40px; }
+        #startButton { padding: 15px 30px; font-size: 20px; background: #00ff88; color: #0a0a0f; border: none; border-radius: 5px; cursor: pointer; transition: transform 0.2s; }
+        #startButton:hover { transform: scale(1.05); box-shadow: 0 0 30px #00ff88; }
+        #difficultyScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10,10,15,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 200; }
+        #difficultyScreen h1 { color: #00ff88; font-size: 40px; margin-bottom: 40px; }
+        .difficulty-btn { padding: 15px 30px; font-size: 20px; margin: 10px; background: #1a1a2e; color: #fff; border: 2px solid #00ff88; border-radius: 5px; cursor: pointer; width: 200px; transition: all 0.3s; }
+        .difficulty-btn:hover { background: #00ff88; color: #0a0a0f; }
+        .difficulty-btn.easy { background: #44aaff; border-color: #44aaff; }
+        .difficulty-btn.medium { background: #ffaa44; border-color: #ffaa44; }
+        .difficulty-btn.hard { background: #ff4444; color: #fff; border-color: #ff4444; }
+        #controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 16px; }
+        #pauseMenu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 300; }
+        #pauseMenu h1 { color: #00ff88; font-size: 36px; margin-bottom: 30px; }
+        .menu-btn { padding: 15px 30px; font-size: 20px; margin: 15px; background: #1a1a2e; color: #fff; border: 2px solid #00ff88; border-radius: 5px; cursor: pointer; width: 200px; transition: all 0.3s; }
+        .menu-btn:hover { background: #00ff88; color: #0a0a0f; }
+        .menu-btn.resume { width: 200px; }
+        .menu-btn.exit { width: 200px; background: #ff4444; border-color: #ff4444; }
     </style>
 </head>
 <body>
@@ -111,8 +39,14 @@
         <div id="highScore">High Score: 0</div>
         <div id="startScreen">
             <h1>Car Racing Game</h1>
-            <p>Avoid obstacles and collect stars!</p>
+            <p>Select Difficulty</p>
             <button id="startButton">Start Game</button>
+        </div>
+        <div id="difficultyScreen">
+            <h1>Select Difficulty</h1>
+            <button class="difficulty-btn easy">Easy</button>
+            <button class="difficulty-btn medium">Medium</button>
+            <button class="difficulty-btn hard">Hard</button>
         </div>
         <div id="controls">Arrow keys to move</div>
     </div>
@@ -123,12 +57,30 @@
         const scoreEl = document.getElementById('score');
         const highScoreEl = document.getElementById('highScore');
         const startScreen = document.getElementById('startScreen');
+        const difficultyScreen = document.getElementById('difficultyScreen');
         const startButton = document.getElementById('startButton');
+        const pauseMenu = document.createElement('div');
+        pauseMenu.id = 'pauseMenu';
+        pauseMenu.innerHTML = `
+            <h1>Paused</h1>
+            <button class="menu-btn resume">Resume</button>
+            <button class="menu-btn exit">Exit</button>
+        `;
+        document.body.appendChild(pauseMenu);
         
         let canvasWidth, canvasHeight;
         let gameRunning = false;
         let score = 0;
         let highScore = parseInt(localStorage.getItem('racingHighScore')) || 0;
+        let currentDifficulty = 'medium';
+        let gameSpeed = 3;
+        let lineY = 0;
+        
+        const difficultySettings = {
+            easy: { obstacleSpeed: 1.5, starSpeed: 0.5, spawnRate: 0.01 },
+            medium: { obstacleSpeed: 2.5, starSpeed: 1, spawnRate: 0.02 },
+            hard: { obstacleSpeed: 4, starSpeed: 1.5, spawnRate: 0.03 }
+        };
         
         function resizeCanvas() {
             canvasWidth = window.innerWidth;
@@ -139,10 +91,6 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
         
-        // Road line position for scrolling effect
-        let lineY = 0;
-        
-        // Player car
         const player = {
             x: canvasWidth / 2 - 40,
             y: canvasHeight - 80,
@@ -152,25 +100,21 @@
             dx: 0
         };
         
-        // Obstacles
         let obstacles = [];
         let stars = [];
         
-        // Input
-        const keys = {
-            ArrowLeft: false,
-            ArrowRight: false,
-            ArrowUp: false,
-            ArrowDown: false
-        };
+        const keys = { ArrowLeft: false, ArrowRight: false, Escape: false };
         
         window.addEventListener('keydown', (e) => {
             if (e.key in keys) {
                 keys[e.key] = true;
-                e.preventDefault();
             }
             if (e.key === 'Enter' && !gameRunning) {
-                startGame();
+                startGame('medium');
+            }
+            if (e.key === 'Escape' && gameRunning) {
+                gameRunning = false;
+                pauseMenu.style.display = 'flex';
             }
         });
         
@@ -180,51 +124,31 @@
             }
         });
         
-        // Game objects
-        function createObstacle() {
-            const width = Math.random() * 60 + 40;
-            const height = Math.random() * 40 + 40;
-            const x = Math.random() * (canvasWidth - width);
-            const y = -height;
-            return { x, y, width, height, speed: Math.random() * 3 + 2 };
-        }
+        startButton.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            difficultyScreen.style.display = 'flex';
+        });
         
-        function createStar() {
-            const size = Math.random() * 15 + 5;
-            const x = Math.random() * (canvasWidth - size);
-            const y = -size;
-            return { x, y, size, speed: Math.random() * 2 + 1 };
-        }
+        document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentDifficulty = btn.className.replace('difficulty-btn ', '').trim();
+                gameSpeed = difficultySettings[currentDifficulty].obstacleSpeed;
+                difficultyScreen.style.display = 'none';
+                startGame(currentDifficulty);
+            });
+        });
         
-        function startGame() {
+        function startGame(diff) {
             gameRunning = true;
             score = 0;
             obstacles = [];
             stars = [];
+            lineY = 0;
+            gameSpeed = difficultySettings[diff].obstacleSpeed;
             startScreen.style.display = 'none';
-            player.dx = 0;
             requestAnimationFrame(gameLoop);
         }
         
-        // Spawn obstacles and stars
-        function spawnObjects() {
-            if (Math.random() < 0.02) {
-                obstacles.push(createObstacle());
-            }
-            if (Math.random() < 0.01) {
-                stars.push(createStar());
-            }
-        }
-        
-        // Collision detection
-        function checkCollision(rect1, rect2) {
-            return rect1.x < rect2.x + rect2.width &&
-                   rect1.x + rect1.width > rect2.x &&
-                   rect1.y < rect2.y + rect2.height &&
-                   rect1.y + rect1.height > rect2.y;
-        }
-        
-        // Game loop
         function gameLoop() {
             if (!gameRunning) return;
             
@@ -238,18 +162,23 @@
             ctx.fillStyle = '#1a1a2e';
             ctx.fillRect(canvasWidth * 0.2, 0, canvasWidth * 0.6, canvasHeight);
             
-            // Road lines
-            ctx.fillStyle = '#fff';
-            lineY += 5;
-            if (lineY > 40) lineY = 0;
-            for (let i = 0; i < canvasHeight / 40 + 1; i++) {
-                ctx.fillRect(canvasWidth / 2 - 10, (i * 40 - lineY) % 40, 20, 20);
+            // Player movement - automatic, stays in lane
+            // No keyboard controls - AI drives
+            
+            // Spawn
+            if (Math.random() < difficultySettings[currentDifficulty].spawnRate) {
+                const width = Math.random() * 60 + 40;
+                const height = Math.random() * 40 + 40;
+                const x = Math.random() * (canvasWidth - width);
+                obstacles.push({ x, y: -height, width, height, speed: gameSpeed });
+            }
+            if (Math.random() < 0.01) {
+                const size = Math.random() * 15 + 5;
+                const x = Math.random() * (canvasWidth - size);
+                stars.push({ x, y: -size, size, speed: difficultySettings[currentDifficulty].starSpeed });
             }
             
-            // Spawn objects
-            spawnObjects();
-            
-            // Update and draw obstacles
+            // Obstacles
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 const obs = obstacles[i];
                 obs.y += obs.speed;
@@ -261,17 +190,19 @@
                     continue;
                 }
                 
-                // Draw obstacle
                 ctx.fillStyle = '#ff5555';
                 ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
                 
                 // Collision
-                if (checkCollision(player, obs)) {
+                if (player.x < obs.x + obs.width &&
+                    player.x + player.width > obs.x &&
+                    player.y < obs.y + obs.height &&
+                    player.y + player.height > obs.y) {
                     gameOver();
                 }
             }
             
-            // Update and draw stars
+            // Stars
             for (let i = stars.length - 1; i >= 0; i--) {
                 const star = stars[i];
                 star.y += star.speed;
@@ -281,34 +212,29 @@
                     continue;
                 }
                 
-                // Draw star
                 ctx.fillStyle = '#ffdd00';
                 ctx.beginPath();
-                ctx.arc(star.x + star.size / 2, star.y + star.size / 2, star.size / 2, 0, Math.PI * 2);
+                ctx.arc(star.x + star.size/2, star.y + star.size/2, star.size/2, 0, Math.PI*2);
                 ctx.fill();
                 
-                // Collect star
-                const dx = player.x + player.width / 2 - (star.x + star.size / 2);
-                const dy = player.y + player.height / 2 - (star.y + star.size / 2);
-                const dist = Math.sqrt(dx * dx + dy * dy);
+                // Collect
+                const dx = player.x + player.width/2 - (star.x + star.size/2);
+                const dy = player.y + player.height/2 - (star.y + star.size/2);
+                const dist = Math.sqrt(dx*dx + dy*dy);
                 
-                if (dist < player.width / 2 + star.size / 2) {
+                if (dist < player.width/2 + star.size/2) {
                     stars.splice(i, 1);
                     score += 50;
                     scoreEl.textContent = `Score: ${score}`;
                 }
             }
             
-            // Update and draw player
+            // Player movement
             player.dx = (keys.ArrowRight ? 1 : 0) - (keys.ArrowLeft ? 1 : 0);
             player.x += player.dx * player.speed;
             
-            // Keep player on road
-            if (player.x < canvasWidth * 0.2) {
-                player.x = canvasWidth * 0.2;
-            } else if (player.x + player.width > canvasWidth * 0.8) {
-                player.x = canvasWidth * 0.8 - player.width;
-            }
+            if (player.x < canvasWidth * 0.2) player.x = canvasWidth * 0.2;
+            if (player.x + player.width > canvasWidth * 0.8) player.x = canvasWidth * 0.8 - player.width;
             
             ctx.fillStyle = '#00ff88';
             ctx.fillRect(player.x, player.y, player.width, player.height);
@@ -324,7 +250,31 @@
             }
             highScoreEl.textContent = `High Score: ${highScore}`;
             startScreen.style.display = 'flex';
+            difficultyScreen.style.display = 'none';
+            pauseMenu.style.display = 'none';
         }
+        
+        // Pause/Resume with Escape
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && gameRunning) {
+                gameRunning = false;
+                pauseMenu.style.display = 'flex';
+            }
+        });
+        
+        // Pause menu buttons
+        pauseMenu.querySelector('.resume').addEventListener('click', () => {
+            gameRunning = true;
+            pauseMenu.style.display = 'none';
+            requestAnimationFrame(gameLoop);
+        });
+        
+        pauseMenu.querySelector('.exit').addEventListener('click', () => {
+            gameRunning = false;
+            startScreen.style.display = 'flex';
+            difficultyScreen.style.display = 'none';
+            pauseMenu.style.display = 'none';
+        });
         
         // Initialize
         scoreEl.textContent = `Score: ${score}`;
